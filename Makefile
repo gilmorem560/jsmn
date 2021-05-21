@@ -1,36 +1,39 @@
-# You can put your build options here
--include config.mk
+# jsmn - Makefile
+#
+# install/uninstall at your own risk in $(PREFIX)
+PREFIX		=	/usr
 
-test: test_default test_strict test_links test_strict_links
-test_default: test/tests.c jsmn.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o test/$@
-	./test/$@
-test_strict: test/tests.c jsmn.h
-	$(CC) -DJSMN_STRICT=1 $(CFLAGS) $(LDFLAGS) $< -o test/$@
-	./test/$@
-test_links: test/tests.c jsmn.h
-	$(CC) -DJSMN_PARENT_LINKS=1 $(CFLAGS) $(LDFLAGS) $< -o test/$@
-	./test/$@
-test_strict_links: test/tests.c jsmn.h
-	$(CC) -DJSMN_STRICT=1 -DJSMN_PARENT_LINKS=1 $(CFLAGS) $(LDFLAGS) $< -o test/$@
-	./test/$@
+AR			= 	ar rcs
+CC			=	cc
+CFLAGS		=	-O2 -c -fPIC
+CP			=	cp
+LDFLAGS		=	-shared
+RM			=	rm -rf
 
-simple_example: example/simple.c jsmn.h
-	$(CC) $(LDFLAGS) $< -o $@
+STATIC_LIB	=	libjsmn.a
+DYNAMIC_LIB	=	libjsmn.so
 
-jsondump: example/jsondump.c jsmn.h
-	$(CC) $(LDFLAGS) $< -o $@
+JSMN		=	jsmn.o
 
-fmt:
-	clang-format -i jsmn.h test/*.[ch] example/*.[ch]
+all: $(STATIC_LIB) $(DYNAMIC_LIB)
 
-lint:
-	clang-tidy jsmn.h --checks='*'
+install: all
+	cp $(STATIC_LIB) $(DYNAMIC_LIB) $(PREFIX)/lib
+	cp jsmn.h $(PREFIX)/include
+
+uninstall:
+	$(RM) $(PREFIX)/lib/$(STATIC_LIB)
+	$(RM) $(PREFIX)/lib/$(DYNAMIC_LIB)
+	$(RM) $(PREFIX)/include/jsmn.h
+
+$(STATIC_LIB): $(JSMN)
+	$(AR) $@ $<
+
+$(DYNAMIC_LIB): $(JSMN)
+	$(CC) $(LDFLAGS) -o $@ $<
+
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o example/*.o
-	rm -f simple_example
-	rm -f jsondump
-
-.PHONY: clean test
-
+	$(RM) $(STATIC_LIB) $(DYNAMIC_LIB) $(JSMN)

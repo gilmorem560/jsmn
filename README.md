@@ -1,14 +1,12 @@
 JSMN
 ====
 
-[![Build Status](https://travis-ci.org/zserge/jsmn.svg?branch=master)](https://travis-ci.org/zserge/jsmn)
-
 jsmn (pronounced like 'jasmine') is a minimalistic JSON parser in C.  It can be
 easily integrated into resource-limited or embedded projects.
 
 You can find more information about JSON format at [json.org][1]
 
-Library sources are available at https://github.com/zserge/jsmn
+Library sources are available at https://github.com/gilmorem560/jsmn
 
 The web page with some information about jsmn can be found at
 [http://zserge.com/jsmn.html][2]
@@ -79,7 +77,8 @@ it possible to use zero-copy techniques.
 Usage
 -----
 
-Download `jsmn.h`, include it, done.
+Download this project and build with GNU Make. Static and dynamic libraries
+will be built which can then be installed or used elsewhere.
 
 ```
 #include "jsmn.h"
@@ -90,20 +89,6 @@ jsmntok_t t[128]; /* We expect no more than 128 JSON tokens */
 
 jsmn_init(&p);
 r = jsmn_parse(&p, s, strlen(s), t, 128);
-```
-
-Since jsmn is a single-header, header-only library, for more complex use cases
-you might need to define additional macros. `#define JSMN_STATIC` hides all
-jsmn API symbols by making them static. Also, if you want to include `jsmn.h`
-from multiple C files, to avoid duplication of symbols you may define  `JSMN_HEADER` macro.
-
-```
-/* In every .c file that uses jsmn include only declarations: */
-#define JSMN_HEADER
-#include "jsmn.h"
-
-/* Additionally, create one jsmn.c file for jsmn implementation: */
-#include "jsmn.h"
 ```
 
 API
